@@ -4,7 +4,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Github 2000</title>
+    <title>Pipeline as Code GH Helper</title>
     <!-- Latest compiled and minified CSS -->
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -20,21 +20,29 @@
      $(document).on('submit','#form',function(){
          jeez = JSON.stringify({
              "name": $("#appname")[0].value,
+             "description": $("#appdescription")[0].value,
              "url": $("#appurl")[0].value,
              "redirect_url": window.location.origin + "/redirect",
              "public": true,
              "hook_attributes": {
-                 "url": "https://{{ .webhook_route_host }}",
+                 "url": $("#webhookurl")[0].value,
              },
              "default_permissions": {
+                 "checks": "write",
+                 "contents": "write",
                  "issues": "write",
-                 "checks": "write"
+                 "members": "read",
+                 "metadata": "read",
+                 "organization_plan": "read",
+                 "pull_requests": "write"
              },
              "default_events": [
-                 "issues",
+                 "commit_comment",
                  "issue_comment",
-                 "check_suite",
-                 "check_run"
+                 "pull_request",
+                 "pull_request_review",
+                 "pull_request_review_comment",
+                 "push"
              ]
          });
          /*TODO: ?state=abc123?*/
@@ -55,36 +63,63 @@
     </script>
   </head>
   <body>
-    <div class="jumbotron">
-      <h2>Create a GitHub App Manifest</h2>
+    <div class="jumbotron text-center">
+      <img src="https://tekton.dev/partner-logos/tekton-friends.png" alt="" width="20%" height="20%" align="right" />
+      <h2>😼 Create a Pipelines as Code Github APP 😼</h2>
     </div>
 
     <div class="container">
-        <form id="form">
 
-          <div class="row">
-            <div class="col-md-2">GitHub Organization: </div>
-            <div class="col-md-6"><input id="organization" type="text" value="chmoutest" /><br/></div>
+      <form id="form">
+
+          <div class="row text-center">
+            <div class="col-md-4">Name: </div>
+            <div class="col-md-4"><input id="appname" type="text" value="ChmouTest" /></div>
           </div>
 
-          <div class="row">
-            <div class="col-md-2">App Name: </div>
-            <div class="col-md-6"><input id="appname" type="text" value="ChmouTest" /><br/></div>
+          <div class="row text-center">
+            <div class="col-md-4">Description: </div>
+            <div class="col-md-4"><input id="appdescription" type="text" value="Application for Pipelines as Code" /></div>
           </div>
 
-          <div class="row">
-            <div class="col-md-2">App URL: </div>
-            <div class="col-md-6"><input id="appurl" type="text" value="https://chmoutest.com" /><br/></div>
+          <div class="row text-center">
+            <div class="col-md-4">URL: </div>
+            <div class="col-md-4"><input id="appurl" type="text" value="https://chmoutest.com" /></div>
+          </div>
+
+          <div class="row text-center">
+            <div class="col-md-4">GitHub Organization (optional): </div>
+            <div class="col-md-4"><input id="organization" type="text" value="chmoutest" /></div>
+          </div>
+
+          <div class="row text-center">
+            <div class="col-md-4">
+              Route:
+            </div>
+            <div class="col-md-4">
+              <input id="webhookurl" size="33" type="text" value="https://{{ .webhook_route_host }}" />
+            </div>
           </div>
 
           <br>
-          <div class="row">
-            <div class="col-md-2"></div>
-            <div class="col-md-6">
-              <input value="Submit" type="submit" id="submit">
+          <div class="row text-center">
+            <div class="col-md-4">Submit: </div>
+            <div class="col-md-4">
+              <input value="Create App" type="submit" id="submit">
             </div>
-            <div class="col-md-2"></div>
           </div>
+
+          <br>
+          {{ if .warning }}
+          <div class="row">
+            <div class="col-md-8">
+              <div style="width: 60%" class="alert align-left alert-danger" role="alert">
+                {{ .warning }}
+              </div>
+            </div>
+          </div>
+          {{ end }}
+
         </form>
       </div>
       <!-- /* input = document.getElementById("manifest")
