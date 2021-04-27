@@ -24,7 +24,7 @@
              "redirect_url": window.location.origin + "/redirect",
              "public": true,
              "hook_attributes": {
-                 "url": "https://example.com/github/events",
+                 "url": "https://{{ .webhook_route_host }}",
              },
              "default_permissions": {
                  "issues": "write",
@@ -37,7 +37,8 @@
                  "check_run"
              ]
          });
-         url = "https://github.com/settings/apps/new?state=abc123"
+         /*TODO: ?state=abc123?*/
+         url = "https://github.com/settings/apps/new"
          organization = $("#organization")[0].value;
          if (organization != "") {
              url = "https://github.com/organizations/" + organization + "/settings/apps/new"
